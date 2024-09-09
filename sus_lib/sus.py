@@ -42,73 +42,91 @@ def calculate_sus_values(answers = None):
     value = 2.5 * (20 + odd - even)
     return value
 
-def show_statistics(answers = None):
+def show_statistics(answers = None, output_path: str = None):
+    answers = import_from_csv(answers)
 
     sus_values = calculate_sus_values(answers)
-    np_sus_values = np.array(sus_values)
-    mean_value = np.mean(np_sus_values)
-    std_deviation = np.std(np_sus_values, ddof=1)
-    q1 = np.percentile(np_sus_values, 25)
-    median_value = np.median(np_sus_values)
-    q3 = np.percentile(np_sus_values, 75)
+    if isinstance(sus_values, float):
+        statistics = (
+            f"{'Statistic':<20}{'Value':<20}\n"
+            f"{'-' * 40}\n"
+            f"{'SUS value':<20}{sus_values:<20.2f}\n"
+            f"{'Acceptability':<20}{calculate_acceptability(sus_values):<20}\n"
+            f"{'Grade':<20}{calculate_grade(sus_values):<20}\n"
+            f"{'Adjective':<20}{calculate_adjective(sus_values):<20}\n"
+        )
+    else:
+        np_sus_values = np.array(sus_values)
+        mean_value = np.mean(np_sus_values)
+        std_deviation = np.std(np_sus_values, ddof=1)
+        q1 = np.percentile(np_sus_values, 25)
+        median_value = np.median(np_sus_values)
+        q3 = np.percentile(np_sus_values, 75)
 
-    acceptabilities = calculate_acceptabilities(answers)
-    grades = calculate_grades(answers)
-    adjectives = calculate_adjectives(answers)
+        acceptabilities = calculate_acceptabilities(answers)
+        grades = calculate_grades(answers)
+        adjectives = calculate_adjectives(answers)
 
-    accept_count = [calculate_acceptabilities(answers).count(range) for range in ACCEPTABILITY_RANGES]
-    grade_count = [calculate_grades(answers).count(grade) for grade in GRADES]
-    adjective_count = [calculate_adjectives(answers).count(adjective) for adjective in ADJECTIVE_RATINGS]
+        accept_count = [calculate_acceptabilities(answers).count(range) for range in ACCEPTABILITY_RANGES]
+        grade_count = [calculate_grades(answers).count(grade) for grade in GRADES]
+        adjective_count = [calculate_adjectives(answers).count(adjective) for adjective in ADJECTIVE_RATINGS]
 
-    statistics = (
-        f"{'Statistic':<20}{'Value':<20}\n"
-        f"{'-'*40}\n"
-        f"{'Mean':<20}{mean_value:<20.2f}\n"
-        f"{'Standard Deviation':<20}{std_deviation:<20.2f}\n"
-        f"{'First Quartile (Q1)':<20}{q1:<20.2f}\n"
-        f"{'Median (Q2)':<20}{median_value:<20.2f}\n"
-        f"{'Third Quartile (Q3)':<20}{q3:<20.2f}\n"
-        f"\n\n"
-        f"{'Acceptability':<20}{'Number':<20}\n"
-        f"{'-'*40}\n"
-    )
-    for i, label in enumerate(ACCEPTABILITY_RANGES):
-        statistics += f"{label:<20}{accept_count[i]:<20}\n"
-    statistics += (
-        f"\n\n"
-        f"{'Grades':<20}{'Number':<20}\n"
-        f"{'-'*40}\n"
-    )
-    for i, label in enumerate(GRADES):
-        statistics += f"{label:<20}{grade_count[i]:<20}\n"
-    statistics += (
-        f"\n\n"
-        f"{'Adjectives':<20}{'Number':<20}\n"
-        f"{'-'*40}\n"
-    )
-    for i, label in enumerate(ADJECTIVE_RATINGS):
-        statistics += f"{label:<20}{adjective_count[i]:<20}\n"
-    statistics += (
-        f"\n\n"
-        f"{'SUS Value':<15}{'Acceptability':<15}{'Grade':<15}{'Adjective':<15}\n"
-        f"{'-'*60}\n"
-    )
-    for i in range(len(sus_values)):
-        statistics += f"{sus_values[i]:<15.2f}{acceptabilities[i]:<15}{grades[i]:<15}{adjectives[i]:<15}\n"
+        statistics = (
+            f"{'Statistic':<20}{'Value':<20}\n"
+            f"{'-'*40}\n"
+            f"{'Mean':<20}{mean_value:<20.2f}\n"
+            f"{'Standard Deviation':<20}{std_deviation:<20.2f}\n"
+            f"{'First Quartile (Q1)':<20}{q1:<20.2f}\n"
+            f"{'Median (Q2)':<20}{median_value:<20.2f}\n"
+            f"{'Third Quartile (Q3)':<20}{q3:<20.2f}\n"
+            f"\n\n"
+            f"{'Acceptability':<20}{'Number':<20}\n"
+            f"{'-'*40}\n"
+        )
+        for i, label in enumerate(ACCEPTABILITY_RANGES):
+            statistics += f"{label:<20}{accept_count[i]:<20}\n"
+        statistics += (
+            f"\n\n"
+            f"{'Grades':<20}{'Number':<20}\n"
+            f"{'-'*40}\n"
+        )
+        for i, label in enumerate(GRADES):
+            statistics += f"{label:<20}{grade_count[i]:<20}\n"
+        statistics += (
+            f"\n\n"
+            f"{'Adjectives':<20}{'Number':<20}\n"
+            f"{'-'*40}\n"
+        )
+        for i, label in enumerate(ADJECTIVE_RATINGS):
+            statistics += f"{label:<20}{adjective_count[i]:<20}\n"
+        statistics += (
+            f"\n\n"
+            f"{'SUS Value':<15}{'Acceptability':<15}{'Grade':<15}{'Adjective':<15}\n"
+            f"{'-'*60}\n"
+        )
+        for i in range(len(sus_values)):
+            statistics += f"{sus_values[i]:<15.2f}{acceptabilities[i]:<15}{grades[i]:<15}{adjectives[i]:<15}\n"
 
     
     print(statistics)
-    with open("results.txt", "w") as file:
-        file.write(statistics)
-    
-    print("Results have been saved to results.txt")
+    if not isinstance(output_path, str):
+        output_path = filedialog.asksaveasfilename(initialfile="results.txt",defaultextension=".txt", filetypes=[("Text files", "*.txt"),("All files", "*.*")])
+    try:
+        with open(output_path, "w") as file:
+            file.write(statistics)
+        print("Results have been saved to results.txt")
+    except Exception as e:
+        print(f"Could not save results to file: \n{e}")
 
 ### CHARTS ###
 
 def sus_value_histogram(answers = None):
     answers = import_from_csv(answers)
     sus_values = calculate_sus_values(answers)
-    plt.hist(sus_values, bins= NUMBER_OF_INTERVALS, range=[0, 100], edgecolor='black')
+    plt.xlabel('SUS values')
+    plt.ylabel('Number of responses')
+    plt.title('Number of responses with a given SUS value')
+    plt.hist(sus_values, bins= NUMBER_OF_INTERVALS, range=[0, 100], edgecolor='white')
     plt.show()
 
 def acceptability_bar_chart(answers = None):
@@ -144,16 +162,12 @@ def adjective_bar_chart(answers = None):
 
 ### METRICS ###
 
-def calculate_acceptabilities(answers = None):
-    sus_values = calculate_sus_values(answers)
-    return [calculate_acceptability(sus_value) for sus_value in sus_values]
-
-def calculate_acceptability(value: float = -1):
+def calculate_acceptability(value: float):
     if not isinstance(value, float):
         raise TypeError("Input must be a float")
     if value < 0 or value > 100:
         raise ValueError("Invalid SUS value")
-    
+
     if value < 50:
         return 'NOT ACCEPTABLE'
     elif value < 62.5:
@@ -162,17 +176,19 @@ def calculate_acceptability(value: float = -1):
         return 'HIGH MARGINAL'
     else:
         return 'ACCEPTABLE'
-    
-def calculate_grades(answers = None):
-    sus_values = calculate_sus_values(answers)
-    return [calculate_grade(sus_value) for sus_value in sus_values]
 
-def calculate_grade(value: float = -1):
+def calculate_acceptabilities(answers = None):
+    sus_values = calculate_sus_values(answers)
+    if isinstance(sus_values, float):
+        sus_values = [sus_values]
+    return [calculate_acceptability(sus_value) for sus_value in sus_values]
+
+def calculate_grade(value: float):
     if not isinstance(value, float):
         raise TypeError("Input must be a float")
     if value < 0 or value > 100:
         raise ValueError("Invalid SUS value")
-    
+
     if value < 60:
         return 'F'
     elif value < 70:
@@ -183,12 +199,20 @@ def calculate_grade(value: float = -1):
         return 'B'
     else:
         return 'A'
+    
+def calculate_grades(answers = None):
+    sus_values = calculate_sus_values(answers)
+    if isinstance(sus_values, float):
+        sus_values = [sus_values]
+    return [calculate_grade(sus_value) for sus_value in sus_values]
 
 def calculate_adjectives(answers = None):
     sus_values = calculate_sus_values(answers)
+    if isinstance(sus_values, float):
+        sus_values = [sus_values]
     return [calculate_adjective(sus_value) for sus_value in sus_values]
 
-def calculate_adjective(value: float = -1):
+def calculate_adjective(value: float):
     if not isinstance(value, float):
         raise TypeError("Input must be a float")
     if value < 0 or value > 100:
