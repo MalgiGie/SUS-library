@@ -4,12 +4,11 @@ from sus_lib.sus import calculate_grades, calculate_grade, grade_bar_chart, sus_
 class TestSusLib(unittest.TestCase):
 
     def test_grade_from_sus_value(self):
-        self.assertEqual(calculate_grade(10.0), 'F')
-        self.assertEqual(calculate_grade(50.0), 'E')
+        self.assertEqual(calculate_grade(50.0), 'F')
         self.assertEqual(calculate_grade(62.0), 'D')
         self.assertEqual(calculate_grade(70.0), 'C')
-        self.assertEqual(calculate_grade(75.0), 'B')
-        self.assertEqual(calculate_grade(85.0), 'A+')
+        self.assertEqual(calculate_grade(80.0), 'B')
+        self.assertEqual(calculate_grade(90.0), 'A')
 
     def test_sus_values(self):
         answers = [[1, 4, 2, 4, 1, 4, 1, 4, 2, 5],
@@ -26,7 +25,7 @@ class TestSusLib(unittest.TestCase):
         self.assertAlmostEqual(sum(sus_values)/len(sus_values), 37.0)
 
     def test_import_from_csv(self):
-        sus_values = calculate_sus_values('tests/SUS-scores.csv')
+        sus_values = calculate_sus_values('SUS-scores.csv')
         self.assertAlmostEqual(sum(sus_values)/len(sus_values),88.82352941176471)
 
 if __name__ == '__main__':

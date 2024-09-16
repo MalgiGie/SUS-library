@@ -32,14 +32,14 @@ def calculate_sus_values(answers = None):
     if not (all(isinstance(item, int) and 1 <= item <= 5 for item in answers) and len(answers) == 10):
         raise TypeError("Input must be a list of 10 integers from range <1, 5>")
         
-    even = 0
-    odd = 0
+    X = 0
+    Y = 0
     for i, answer in enumerate(answers):
         if i % 2 == 0:
-            odd += answer
+            X += answer - 1
         else:
-            even += answer
-    value = 2.5 * (20 + odd - even)
+            Y += 5 - answer
+    value = 2.5 * (X + Y)
     return value
 
 def show_statistics(answers = None, output_path: str = None):
