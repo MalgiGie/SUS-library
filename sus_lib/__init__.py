@@ -1,1 +1,1 @@
-from .sus import calculate_sus_values, show_statistics, sus_value_histogram, acceptability_bar_chart, grade_bar_chart, adjective_bar_chart, calculate_acceptabilities, calculate_acceptability, calculate_grades, calculate_grade, calculate_adjectives, calculate_adjective 
+from .sus import import_from_csv, calculate_sus_values, show_statistics, sus_value_histogram, acceptability_bar_chart, grade_bar_chart, adjective_bar_chart, calculate_acceptabilities, calculate_acceptability, calculate_grades, calculate_grade, calculate_adjectives, calculate_adjective

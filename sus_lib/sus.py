@@ -32,14 +32,14 @@ def calculate_sus_values(answers = None):
     if not (all(isinstance(item, int) and 1 <= item <= 5 for item in answers) and len(answers) == 10):
         raise TypeError("Input must be a list of 10 integers from range <1, 5>")
         
-    X = 0
-    Y = 0
+    x = 0
+    y = 0
     for i, answer in enumerate(answers):
         if i % 2 == 0:
-            X += answer - 1
+            x += answer - 1
         else:
-            Y += 5 - answer
-    value = 2.5 * (X + Y)
+            y += 5 - answer
+    value = 2.5 * (x + y)
     return value
 
 def show_statistics(answers = None, output_path: str = None):
@@ -67,11 +67,15 @@ def show_statistics(answers = None, output_path: str = None):
         grades = calculate_grades(answers)
         adjectives = calculate_adjectives(answers)
 
-        accept_count = [calculate_acceptabilities(answers).count(range) for range in ACCEPTABILITY_RANGES]
+        accept_count = [calculate_acceptabilities(answers).count(acceptability) for acceptability in ACCEPTABILITY_RANGES]
         grade_count = [calculate_grades(answers).count(grade) for grade in GRADES]
         adjective_count = [calculate_adjectives(answers).count(adjective) for adjective in ADJECTIVE_RATINGS]
 
-        statistics = (
+        statistics = f"SUS values\n{'-'*40}\n"
+
+        statistics += '\n'.join(map(str, sus_values)) + '\n\n\n'
+
+        statistics += (
             f"{'Statistic':<20}{'Value':<20}\n"
             f"{'-'*40}\n"
             f"{'Mean':<20}{mean_value:<20.2f}\n"
@@ -126,7 +130,7 @@ def sus_value_histogram(answers = None):
     plt.xlabel('SUS values')
     plt.ylabel('Number of responses')
     plt.title('Number of responses with a given SUS value')
-    plt.hist(sus_values, bins= NUMBER_OF_INTERVALS, range=[0, 100], edgecolor='white')
+    plt.hist(sus_values, bins= NUMBER_OF_INTERVALS, range=(0, 100), edgecolor='white')
     plt.show()
 
 def acceptability_bar_chart(answers = None):
